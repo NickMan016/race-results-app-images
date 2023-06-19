@@ -1,7 +1,16 @@
+import path from 'path';
 import { Driver } from '../types';
 import fs from 'fs-extra';
 
-const data = fs.readJSONSync(`${ __dirname }/drivers.json`);
+const pathJSON = path.resolve(__dirname, './drivers.json');
+let data:any = [];
+
+if (!fs.existsSync(pathJSON)) {
+    fs.writeJSON(`${__dirname}/drivers.json`, []);
+} else {
+    data = fs.readJSONSync(`${ __dirname }/drivers.json`);
+}
+
 let drivers: Driver[] = data as Driver[];
 
 export const getDrivers = (): Driver[] => drivers;
