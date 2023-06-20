@@ -56,8 +56,8 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const file = req.files.image;
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${(0, uuid_1.v4)()}.${file.mimetype.split('/')[1]}`;
-            yield fs_extra_1.default.ensureDir('./uploads/drivers');
-            yield file.mv(`./uploads/drivers/${image}`, (err) => {
+            yield fs_extra_1.default.ensureDir(`${__dirname}/../../uploads/drivers`);
+            yield file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err) => {
                 if (err) {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 }

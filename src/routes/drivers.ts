@@ -25,8 +25,8 @@ router.post('/', async (req, res) => {
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
             
-            await fs.ensureDir('./uploads/drivers');
-            await file.mv(`./uploads/drivers/${image}`, (err: any) => {
+            await fs.ensureDir(`${__dirname}/../../uploads/drivers`);
+            await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
                 if (err){
                     res.json(`No se pudo subir el archivo, ${ err }`);
                 } else {
@@ -56,8 +56,8 @@ router.put('/', async (req, res) => {
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
             
-            await fs.ensureDir('./uploads/drivers');
-            await file.mv(`./uploads/drivers/${image}`, (err: any) => {
+            await fs.ensureDir(`${__dirname}/../../uploads/drivers`);
+            await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
                 if (err){
                     res.json(`No se pudo subir el archivo, ${ err }`);
                 } else {
