@@ -39,13 +39,13 @@ const express_1 = __importDefault(require("express"));
 const uuid_1 = require("uuid");
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
-const driverServices = __importStar(require("./../services/driverServices"));
+const circuitServices = __importStar(require("../services/circuitServices"));
 const router = express_1.default.Router();
 router.get('/', (_, res) => {
-    res.send(driverServices.getDrivers());
+    res.send(circuitServices.getCircuits());
 });
 router.get('/:id', (req, res) => {
-    res.send(driverServices.getDriverById(req.params.id));
+    res.send(circuitServices.getCircuitById(req.params.id));
 });
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.body.id;
@@ -56,17 +56,17 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const file = req.files.image;
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${(0, uuid_1.v4)()}.${file.mimetype.split('/')[1]}`;
-            yield fs_extra_1.default.ensureDir(`${__dirname}/../../uploads/drivers`);
-            yield file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err) => {
+            yield fs_extra_1.default.ensureDir(`${__dirname}/../../uploads/circuits`);
+            yield file.mv(`${__dirname}/../../uploads/circuits/${image}`, (err) => {
                 if (err) {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 }
                 else {
-                    const newDriver = driverServices.addDriver({
+                    const newCircuit = circuitServices.addCircuit({
                         id,
                         image
                     });
-                    res.json(newDriver);
+                    res.json(newCircuit);
                 }
             });
         }
@@ -84,17 +84,17 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const file = req.files.image;
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${(0, uuid_1.v4)()}.${file.mimetype.split('/')[1]}`;
-            yield fs_extra_1.default.ensureDir(`${__dirname}/../../uploads/drivers`);
-            yield file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err) => {
+            yield fs_extra_1.default.ensureDir(`${__dirname}/../../uploads/circuits`);
+            yield file.mv(`${__dirname}/../../uploads/circuits/${image}`, (err) => {
                 if (err) {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 }
                 else {
-                    const updateDriver = driverServices.updateDriver({
+                    const updateCircuit = circuitServices.updateCircuit({
                         id,
                         image
                     });
-                    res.json(updateDriver);
+                    res.json(updateCircuit);
                 }
             });
         }
@@ -105,13 +105,13 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 router.get('/:id/image', (req, res) => {
     const { id } = req.params;
-    const imageDriver = driverServices.getImage(id);
-    const pathImage = path_1.default.resolve(__dirname, `../../uploads/drivers/${imageDriver}`);
+    const imageCircuit = circuitServices.getImage(id);
+    const pathImage = path_1.default.resolve(__dirname, `../../uploads/circuits/${imageCircuit}`);
     if (fs_extra_1.default.existsSync(pathImage)) {
         res.sendFile(pathImage);
     }
     else {
-        const pathNoImage = path_1.default.resolve(__dirname, '../../uploads/drivers/Default.jpg');
+        const pathNoImage = path_1.default.resolve(__dirname, '../../uploads/circuits/Default.png');
         res.sendFile(pathNoImage);
     }
 });
