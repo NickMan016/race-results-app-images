@@ -64,7 +64,12 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 else {
                     const newTeam = teamServices.addTeam({
                         id,
-                        image
+                        fullImage: {
+                            light: ''
+                        },
+                        miniImage: {
+                            light: image
+                        }
                     });
                     res.json(newTeam);
                 }
@@ -76,7 +81,7 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.body;
+    const { id, typeImage, theme } = req.body;
     if (!req.files || Object.keys(req.files).length === 0) {
         res.json('No se subió un archivo');
     }
@@ -90,10 +95,24 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 }
                 else {
-                    const updateTeam = teamServices.updateTeam({
-                        id,
-                        image
-                    });
+                    const team = teamServices.getTeamById(id);
+                    if (typeImage === 'fullImage') {
+                        if (theme === 'light') {
+                            team ? team.fullImage.light = image : '';
+                        }
+                        else if (theme === 'dark') {
+                            team ? team.fullImage.dark = image : '';
+                        }
+                    }
+                    else if (typeImage === 'miniImage') {
+                        if (theme === 'light') {
+                            team ? team.miniImage.light = image : '';
+                        }
+                        else if (theme === 'dark') {
+                            team ? team.miniImage.dark = image : '';
+                        }
+                    }
+                    const updateTeam = teamServices.updateTeam(team);
                     res.json(updateTeam);
                 }
             });
@@ -103,10 +122,38 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
 }));
-router.get('/:id/image', (req, res) => {
-    const { id } = req.params;
-    const imageTeam = teamServices.getImage(id);
-    const pathImage = path_1.default.resolve(__dirname, `../../uploads/teams/${imageTeam}`);
+router.get('/:id/image/:typeImage/:theme?', (req, res) => {
+    const { id, typeImage, theme } = req.params;
+    const team = teamServices.getImage(id);
+    let image;
+    if (typeImage === 'fullImage') {
+        if (theme === 'light' || theme === undefined) {
+            image = team === null || team === void 0 ? void 0 : team.fullImage.light;
+        }
+        else if (theme === 'dark') {
+            if ((team === null || team === void 0 ? void 0 : team.fullImage.dark) === undefined) {
+                image = team === null || team === void 0 ? void 0 : team.fullImage.light;
+            }
+            else {
+                image = team === null || team === void 0 ? void 0 : team.fullImage.dark;
+            }
+        }
+    }
+    else if (typeImage === 'miniImage') {
+        if (theme === 'light' || theme === undefined) {
+            image = team === null || team === void 0 ? void 0 : team.miniImage.light;
+        }
+        else if (theme === 'dark') {
+            if ((team === null || team === void 0 ? void 0 : team.miniImage.dark) === undefined) {
+                image = team === null || team === void 0 ? void 0 : team.miniImage.light;
+            }
+            else {
+                image = team === null || team === void 0 ? void 0 : team.miniImage.dark;
+            }
+        }
+    }
+    const pathImage = path_1.default.resolve(__dirname, `../../uploads/teams/${image}`);
+    // const pathImage = path.resolve(__dirname, `../../uploads/teams/${imageTeam}`);
     if (fs_extra_1.default.existsSync(pathImage)) {
         res.sendFile(pathImage);
     }

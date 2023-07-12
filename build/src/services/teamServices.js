@@ -30,14 +30,13 @@ const addTeam = (newTeamEntry) => {
 exports.addTeam = addTeam;
 const updateTeam = (updateTeamEntry) => {
     const teamsUpdate = teams.map((team) => team.id === updateTeamEntry.id
-        ? Object.assign(Object.assign({}, team), { image: updateTeamEntry.image }) : team);
+        ? Object.assign({}, team) : team);
     teams = teamsUpdate;
     fs_extra_1.default.writeJSONSync(`${__dirname}/teams.json`, teamsUpdate);
     return updateTeamEntry;
 };
 exports.updateTeam = updateTeam;
 const getImage = (id) => {
-    const team = teams.find(d => d.id === id);
-    return (team === null || team === void 0 ? void 0 : team.image) || undefined;
+    return teams.find(d => d.id === id);
 };
 exports.getImage = getImage;
