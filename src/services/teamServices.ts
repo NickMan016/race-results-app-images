@@ -32,7 +32,7 @@ export const addTeam = (newTeamEntry: Team): Team => {
 export const updateTeam = (updateTeamEntry: Team): Team => {
     const teamsUpdate = teams.map((team) =>
         team.id === updateTeamEntry.id
-            ? { ...team, image: updateTeamEntry.image }
+            ? { ...team }
             : team
     );
 
@@ -41,8 +41,6 @@ export const updateTeam = (updateTeamEntry: Team): Team => {
     return updateTeamEntry;
 }
 
-export const getImage = (id: string): string | undefined => {
-    const team = teams.find(d => d.id === id);
-
-    return team?.image || undefined;
+export const getImage = (id: string): Team | undefined => {
+    return teams.find(d => d.id === id);
 }
