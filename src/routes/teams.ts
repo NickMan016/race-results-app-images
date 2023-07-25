@@ -24,27 +24,36 @@ router.post('/', async (req, res) => {
         const file: any = req.files.image;
 
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-            const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
-
             await fs.ensureDir(`${__dirname}/../../uploads/teams`);
-            await file.mv(`${__dirname}/../../uploads/teams/${image}`, (err: any) => {
-                if (err) {
-                    res.json(`No se pudo subir el archivo, ${err}`);
-                } else {
-                    const newTeam = teamServices.addTeam({
-                        id,
-                        fullImage: {
-                            light: ''
-                        },
-                        miniImage: {
-                            light: image
-                        }
-                    });
 
-                    res.json(newTeam);
-                }
-            });
-
+            if (id === 'default') {
+                await file.mv(`${__dirname}/../../uploads/teams/Default.png`, (err: any) => {
+                    if (err) {
+                        res.json(`No se pudo subir el archivo, ${err}`);
+                    } else {
+                        res.json('Se ha subido el archivo Default');
+                    }
+                });
+            } else {
+                const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
+                await file.mv(`${__dirname}/../../uploads/teams/${image}`, (err: any) => {
+                    if (err) {
+                        res.json(`No se pudo subir el archivo, ${err}`);
+                    } else {
+                        const newTeam = teamServices.addTeam({
+                            id,
+                            fullImage: {
+                                light: ''
+                            },
+                            miniImage: {
+                                light: image
+                            }
+                        });
+    
+                        res.json(newTeam);
+                    }
+                });
+            }
         } else {
             res.json('El archivo no es una imagen');
         }

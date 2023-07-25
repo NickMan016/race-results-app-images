@@ -21,23 +21,33 @@ router.post('/', async (req, res) => {
         res.json('No se subió un archivo');
     } else {
         const file: any = req.files.image;
-        
+
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-            const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
-            
             await fs.ensureDir(`${__dirname}/../../uploads/drivers`);
-            await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
-                if (err){
-                    res.json(`No se pudo subir el archivo, ${ err }`);
-                } else {
-                    const newDriver = driverServices.addDriver({
-                        id,
-                        image
-                    });
-                    
-                    res.json(newDriver);
-                }
-            });
+
+            if (id === 'default') {
+                await file.mv(`${__dirname}/../../uploads/drivers/Default.jpg`, (err: any) => {
+                    if (err) {
+                        res.json(`No se pudo subir el archivo, ${err}`);
+                    } else {
+                        res.json('Se ha subido el archivo Default');
+                    }
+                });
+            } else {
+                const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
+                await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
+                    if (err) {
+                        res.json(`No se pudo subir el archivo, ${err}`);
+                    } else {
+                        const newDriver = driverServices.addDriver({
+                            id,
+                            image
+                        });
+
+                        res.json(newDriver);
+                    }
+                });
+            }
 
         } else {
             res.json('El archivo no es una imagen');
@@ -52,21 +62,21 @@ router.put('/', async (req, res) => {
         res.json('No se subió un archivo');
     } else {
         const file: any = req.files.image;
-        
+
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
-            
+
             await fs.ensureDir(`${__dirname}/../../uploads/drivers`);
             await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
-                if (err){
-                    res.json(`No se pudo subir el archivo, ${ err }`);
+                if (err) {
+                    res.json(`No se pudo subir el archivo, ${err}`);
                 } else {
 
                     const updateDriver = driverServices.updateDriver({
                         id,
                         image
                     });
-                
+
                     res.json(updateDriver);
                 }
             });
@@ -81,7 +91,7 @@ router.get('/:id/image', (req, res) => {
     const { id } = req.params;
     const imageDriver = driverServices.getImage(id);
     const pathImage = path.resolve(__dirname, `../../uploads/drivers/${imageDriver}`);
-    
+
     if (fs.existsSync(pathImage)) {
         res.sendFile(pathImage);
     } else {
