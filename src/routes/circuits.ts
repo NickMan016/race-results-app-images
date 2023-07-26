@@ -21,10 +21,9 @@ router.post('/', async (req, res) => {
         res.json('No se subió un archivo');
     } else {
         const file: any = req.files.image;
-        
+
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             await fs.ensureDir(`${__dirname}/../../uploads/circuits`);
-            const circuit = circuitServices.getCircuitById(id);
 
             if (id === 'default') {
                 await file.mv(`${__dirname}/../../uploads/circuits/Default.png`, (err: any) => {
@@ -37,20 +36,19 @@ router.post('/', async (req, res) => {
             } else {
                 const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
                 await file.mv(`${__dirname}/../../uploads/circuits/${image}`, (err: any) => {
-                    if (err){
-                        res.json(`No se pudo subir el archivo, ${ err }`);
+                    if (err) {
+                        res.json(`No se pudo subir el archivo, ${err}`);
                     } else {
-                        fs.unlink(`${__dirname}/../../uploads/drivers/${circuit?.image}`);
                         const newCircuit = circuitServices.addCircuit({
                             id,
                             image
                         });
-                        
+
                         res.json(newCircuit);
                     }
                 });
             }
-            
+
 
         } else {
             res.json('El archivo no es una imagen');
@@ -65,21 +63,22 @@ router.put('/', async (req, res) => {
         res.json('No se subió un archivo');
     } else {
         const file: any = req.files.image;
-        
+
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
+            const circuit = circuitServices.getCircuitById(id);
             
             await fs.ensureDir(`${__dirname}/../../uploads/circuits`);
             await file.mv(`${__dirname}/../../uploads/circuits/${image}`, (err: any) => {
-                if (err){
-                    res.json(`No se pudo subir el archivo, ${ err }`);
+                if (err) {
+                    res.json(`No se pudo subir el archivo, ${err}`);
                 } else {
-
+                    fs.unlink(`${__dirname}/../../uploads/drivers/${circuit?.image}`);
                     const updateCircuit = circuitServices.updateCircuit({
                         id,
                         image
                     });
-                
+
                     res.json(updateCircuit);
                 }
             });
@@ -94,7 +93,7 @@ router.get('/:id/image', (req, res) => {
     const { id } = req.params;
     const imageCircuit = circuitServices.getImage(id);
     const pathImage = path.resolve(__dirname, `../../uploads/circuits/${imageCircuit}`);
-    
+
     if (fs.existsSync(pathImage)) {
         res.sendFile(pathImage);
     } else {
