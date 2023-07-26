@@ -65,13 +65,14 @@ router.put('/', async (req, res) => {
 
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
+            const driver = driverServices.getDriverById(id);
 
             await fs.ensureDir(`${__dirname}/../../uploads/drivers`);
             await file.mv(`${__dirname}/../../uploads/drivers/${image}`, (err: any) => {
                 if (err) {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 } else {
-
+                    fs.unlink(`${__dirname}/../../uploads/drivers/${driver?.image}`);
                     const updateDriver = driverServices.updateDriver({
                         id,
                         image

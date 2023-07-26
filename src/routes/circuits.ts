@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
         
         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
             await fs.ensureDir(`${__dirname}/../../uploads/circuits`);
+            const circuit = circuitServices.getCircuitById(id);
 
             if (id === 'default') {
                 await file.mv(`${__dirname}/../../uploads/circuits/Default.png`, (err: any) => {
@@ -39,6 +40,7 @@ router.post('/', async (req, res) => {
                     if (err){
                         res.json(`No se pudo subir el archivo, ${ err }`);
                     } else {
+                        fs.unlink(`${__dirname}/../../uploads/drivers/${circuit?.image}`);
                         const newCircuit = circuitServices.addCircuit({
                             id,
                             image

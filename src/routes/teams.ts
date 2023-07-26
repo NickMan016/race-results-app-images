@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
                                 light: image
                             }
                         });
-    
+
                         res.json(newTeam);
                     }
                 });
@@ -76,7 +76,6 @@ router.put('/', async (req, res) => {
                 if (err) {
                     res.json(`No se pudo subir el archivo, ${err}`);
                 } else {
-
                     const team = teamServices.getTeamById(id) as Team;
                     if (typeImage === 'fullImage') {
                         if (theme === 'light') {
@@ -109,9 +108,9 @@ router.get('/:id/image/:typeImage/:theme?', (req, res) => {
     const team = teamServices.getImage(id);
 
     let image;
-    
+
     if (typeImage === 'fullImage') {
-        if(theme === 'light' || theme === undefined) {
+        if (theme === 'light' || theme === undefined) {
             image = team?.fullImage.light;
         } else if (theme === 'dark') {
             if (team?.fullImage.dark === undefined) {
@@ -121,7 +120,7 @@ router.get('/:id/image/:typeImage/:theme?', (req, res) => {
             }
         }
     } else if (typeImage === 'miniImage') {
-        if(theme === 'light' || theme === undefined) {
+        if (theme === 'light' || theme === undefined) {
             image = team?.miniImage.light;
         } else if (theme === 'dark') {
             if (team?.miniImage.dark === undefined) {
