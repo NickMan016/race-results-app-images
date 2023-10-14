@@ -3,7 +3,8 @@
   functions = "functions"  # Directorio donde se encuentran las funciones de servidor
 
 [functions]
-  [[functions.path]]
+    [functions.path]
     external_node_modules = [
-      "api"
+      "module-one",
+      "module-two"
     ]
