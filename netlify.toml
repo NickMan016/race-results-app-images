@@ -2,9 +2,6 @@
   command = "npm run build"  # Comando de compilación personalizado
   functions = "functions"  # Directorio donde se encuentran las funciones de servidor
 
-[[plugins]]
-  package = "@netlify/plugin-functions-core"
-
-[[functions]]
+[functions]
   path = "api"  # Ruta base para tus funciones (puedes personalizarla)
   runtime = "nodejs14"  # El tipo de función Node.js que estás utilizando
