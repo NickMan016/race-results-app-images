@@ -134,16 +134,6 @@ router.get('/:id/image', async (req, res) => {
     } catch (error) {
         res.status(500).send('Error al obtener conductor por id');
     }
-    // const { id } = req.params;
-    // const imageDriver = driverServices.getImage(id);
-    // const pathImage = path.resolve(__dirname, `../../uploads/drivers/${imageDriver}`);
-
-    // if (fs.existsSync(pathImage)) {
-    //     res.sendFile(pathImage);
-    // } else {
-    //     const pathNoImage = path.resolve(__dirname, '../../uploads/drivers/Default.jpg');
-    //     res.sendFile(pathNoImage);
-    // }
 });
 
 export default router;

@@ -1,16 +1,8 @@
 import path from 'path';
 import { Driver } from '../types';
 import fs from 'fs-extra';
-import admin, { ServiceAccount } from 'firebase-admin';
+import { db } from '../config';
 
-import serviceAccount from "../../race-results-api-images-firebase-adminsdk-uym0i-e5471ed4c7.json";
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as ServiceAccount),
-    databaseURL: 'https://race-results-api-images-default-rtdb.firebaseio.com/'
-});
-
-const db = admin.database();
 
 const pathJSON = path.resolve(__dirname, './drivers.json');
 let data:any = [];
