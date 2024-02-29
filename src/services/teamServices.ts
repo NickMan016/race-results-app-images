@@ -1,6 +1,7 @@
 import path from "path";
-import { Team } from "../types";
 import fs from "fs-extra";
+
+import { Team } from "../types";
 import { db } from "../config";
 
 const pathJSON = path.resolve(__dirname, "./teams.json");
@@ -45,23 +46,51 @@ export const getTeamById = async (id: string): Promise<Team | null> => {
   }
 };
 
+export const getTeamNodeById = async (id: string): Promise<string | null> => {
+  try {
+    const teamsRef = db.ref("teams");
+
+    // Realiza la consulta para obtener el objeto con el id específico
+    const snapshot = await teamsRef
+      .orderByChild("id")
+      .equalTo(id)
+      .once("value");
+    // Verifica si hay datos en el resultado
+    if (snapshot.exists()) {
+      const teamKey = Object.keys(snapshot.val())[0];
+      return teamKey;
+    } else {
+      return null; // No se encontró ningúna escuderia con el id especificado
+    }
+  } catch (error) {
+    // console.error('Error:', error);
+    // Manejar el error
+    throw error;
+  }
+};
+
 export const addTeam = (newTeamEntry: Team): Team => {
   const newTeam = {
     ...newTeamEntry,
   };
 
-  db.ref('teams').push(newTeam);
+  db.ref("teams").push(newTeam);
   return newTeam;
 };
 
-export const updateTeam = (updateTeamEntry: Team): Team => {
-  const teamsUpdate = teams.map((team) =>
-    team.id === updateTeamEntry.id ? { ...team } : team
-  );
+export const updateTeam = async (idTeam: string, updateTeamEntry: Team): Promise<Team> => {
+  try {
+    const teamRef = db.ref(`teams/${idTeam}`);
 
-  teams = teamsUpdate;
-  fs.writeJSONSync(`${__dirname}/teams.json`, teamsUpdate);
-  return updateTeamEntry;
+    // Actualiza los datos del conductor con los nuevos datos proporcionados
+    await teamRef.update(updateTeamEntry);
+    return updateTeamEntry;
+  } catch (error) {
+    // Manejar el error
+    throw error;
+  }
+  // teams = teamsUpdate;
+  // fs.writeJSONSync(`${__dirname}/teams.json`, teamsUpdate);
 };
 
 export const getImage = (id: string): Team | undefined => {

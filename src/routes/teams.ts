@@ -103,48 +103,60 @@ router.post("/", async (req, res) => {
   }
 });
 
-// router.put('/', async (req, res) => {
-//     const { id, typeImage, theme } = req.body;
+router.put("/", async (req, res) => {
+  const { id, typeImage, theme } = req.body;
 
-//     if (!req.files || Object.keys(req.files).length === 0) {
-//         res.json('No se subió un archivo');
-//     } else {
-//         const file: any = req.files.image;
+  if (!req.files || Object.keys(req.files).length === 0) {
+    res.json("No se subió un archivo");
+  } else {
+    const file: any = req.files.image;
 
-//         if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-//             const image = `${uuidv4()}.${file.mimetype.split('/')[1]}`;
+    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
+      const image = `${uuidv4()}.${file.mimetype.split("/")[1]}`;
+      const filePath = `${__dirname}/../../uploads/teams/${image}`;
 
-//             await fs.ensureDir(`${__dirname}/../../uploads/teams`);
-//             await file.mv(`${__dirname}/../../uploads/teams/${image}`, (err: any) => {
-//                 if (err) {
-//                     res.json(`No se pudo subir el archivo, ${err}`);
-//                 } else {
-//                     const team = teamServices.getTeamById(id) as Team;
-//                     if (typeImage === 'fullImage') {
-//                         if (theme === 'light') {
-//                             team ? team.fullImage.light = image : '';
-//                         } else if (theme === 'dark') {
-//                             team ? team.fullImage.dark = image : '';
-//                         }
-//                     } else if (typeImage === 'miniImage') {
-//                         if (theme === 'light') {
-//                             team ? team.miniImage.light = image : '';
-//                         } else if (theme === 'dark') {
-//                             team ? team.miniImage.dark = image : '';
-//                         }
-//                     }
+      // const team = (await teamServices.getTeamById(id)) as Team;
+      // const teamKey = (await teamServices.getTeamNodeById(id)) as string;
+      // team.miniImage.dark = "Hola";
+      // const updateTeam = await teamServices.updateTeam(teamKey, team) as Team;
 
-//                     const updateTeam = teamServices.updateTeam(team);
+      // res.json(updateTeam);
 
-//                     res.json(updateTeam);
-//                 }
-//             });
+      await fs.ensureDir(`${__dirname}/../../uploads/teams`);
+      await file.mv(filePath, async (err: any) => {
+        if (err) {
+          res.json(`No se pudo subir el archivo, ${err}`);
+        } else {
+          const response = await cloudinary.uploader.upload(filePath);
+          const team = (await teamServices.getTeamById(id)) as Team;
+          const teamKey = (await teamServices.getTeamNodeById(id)) as string;
+          if (typeImage === "fullImage") {
+            if (theme === "light") {
+              team ? (team.fullImage.light = response.secure_url) : "";
+            } else if (theme === "dark") {
+              team ? (team.fullImage.dark = response.secure_url) : "";
+            }
+          } else if (typeImage === "miniImage") {
+            if (theme === "light") {
+              team ? (team.miniImage.light = response.secure_url) : "";
+            } else if (theme === "dark") {
+              team ? (team.miniImage.dark = response.secure_url) : "";
+            }
+          }
 
-//         } else {
-//             res.json('El archivo no es una imagen');
-//         }
-//     }
-// });
+          const updateTeam = (await teamServices.updateTeam(
+            teamKey,
+            team
+          )) as Team;
+
+          res.json(updateTeam);
+        }
+      });
+    } else {
+      res.json("El archivo no es una imagen");
+    }
+  }
+});
 
 router.get("/:id/image/:typeImage/:theme?", async (req, res) => {
   const { id, typeImage, theme } = req.params;
