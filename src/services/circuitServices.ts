@@ -1,6 +1,7 @@
 import path from 'path';
 import { Circuit } from '../types';
 import fs from 'fs-extra';
+import { db } from '../config';
 
 const pathJSON = path.resolve(__dirname, './circuits.json');
 let data:any = [];
@@ -13,10 +14,32 @@ if (!fs.existsSync(pathJSON)) {
 
 let circuits: Circuit[] = data as Circuit[];
 
-export const getCircuits = (): Circuit[] => circuits;
+export const getCircuits = async (): Promise<Circuit[]> => {
+    const snapshot = await db.ref('circuits').once('value');
+    const circuits: Circuit[] = snapshot.val();
+    return circuits;
+};
 
-export const getCircuitById = (id: string): Circuit | undefined => {
-    return circuits.find(d => d.id === id);
+export const getCircuitById = async (id: string): Promise<Circuit | null> => {
+    try {
+        const circuitsRef = db.ref('circuits');
+
+        // Realiza la consulta para obtener el objeto con el id específico
+        const snapshot = await circuitsRef.orderByChild('id').equalTo(id).once('value');
+        // Verifica si hay datos en el resultado
+        if (snapshot.exists()) {
+            const circuitKey = Object.keys(snapshot.val())[0];
+            // Obtiene el primer hijo (debería ser único porque estamos buscando por id)
+            const circuit = snapshot.val()[circuitKey] as Circuit;
+            return circuit;
+        } else {
+            return null; // No se encontró ningún conductor con el id especificado
+        }
+    } catch (error) {
+        // console.error('Error:', error);
+        // Manejar el error
+        throw error;
+    }
 }
 
 export const addCircuit = (newCircuitEntry: Circuit): Circuit => {
@@ -24,8 +47,7 @@ export const addCircuit = (newCircuitEntry: Circuit): Circuit => {
         ...newCircuitEntry
     }
 
-    circuits.push(newCircuit);
-    fs.writeJSONSync(`${ __dirname }/circuits.json`, circuits);
+    db.ref('circuits').push(newCircuit);
     return newCircuit;
 }
 
